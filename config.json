@@ -1,0 +1,177 @@
+{
+  "gateway_port": 8090,
+  "target_url": "http://127.0.0.1:5001",
+  "trust_proxy": true,
+  "upstream_proxy": "",
+  "secret": "",
+  "decision": {
+    "block": 81,
+    "challenge": 31,
+    "unsure": 10,
+    "grey_zone": [
+      0.45,
+      0.8
+    ],
+    "mode": "block",
+    "captcha_ttl_s": 600,
+    "captcha_max_attempts": 3
+  },
+  "scoring": {
+    "ml_weight": 0.3,
+    "ml_cap": 30,
+    "iforest_cap": 15,
+    "max": 100
+  },
+  "behaviour_cap": 25,
+  "threat_intel": {
+    "enabled": true,
+    "vt_api_key": "",
+    "timeout_s": 3.0,
+    "cache_hours": 24,
+    "cap": 40
+  },
+  "blocklist": {
+    "enabled": true,
+    "ttl_hours": [
+      1,
+      24,
+      168
+    ],
+    "escalate_subnet": true
+  },
+  "deception": {
+    "enabled": true,
+    "inject": true,
+    "auto_block": true
+  },
+  "profiler": {
+    "enabled": true,
+    "max_endpoints": 50,
+    "rate_per_s": 2,
+    "allow_private": true,
+    "depth": 2
+  },
+  "log_size": 500,
+  "profile": {
+    "target": "http://127.0.0.1:5001",
+    "crawled_at": 1793170771.6928535,
+    "duration_s": 15.35,
+    "stack": [
+      "unknown"
+    ],
+    "endpoints": 7,
+    "endpoint_list": [
+      {
+        "path": "/",
+        "method": "GET",
+        "params": []
+      },
+      {
+        "path": "/",
+        "method": "GET",
+        "params": []
+      },
+      {
+        "path": "/api/items",
+        "method": "GET",
+        "params": []
+      },
+      {
+        "path": "/download",
+        "method": "GET",
+        "params": [
+          "file"
+        ]
+      },
+      {
+        "path": "/login",
+        "method": "GET",
+        "params": []
+      },
+      {
+        "path": "/run",
+        "method": "GET",
+        "params": [
+          "cmd"
+        ]
+      },
+      {
+        "path": "/search",
+        "method": "GET",
+        "params": []
+      }
+    ],
+    "params": [
+      "cmd",
+      "file",
+      "pass",
+      "q",
+      "user"
+    ],
+    "forms": 2,
+    "auth_endpoints": [
+      "/login"
+    ],
+    "file_params": [
+      "file"
+    ],
+    "search_params": [
+      "q"
+    ],
+    "has_upload": false,
+    "reflection": {
+      "probe_param": "file",
+      "canary": "aegisprobe70760",
+      "reflected": true
+    },
+    "clusters": {
+      "cluster_0": [
+        "/",
+        "/"
+      ],
+      "singleton_/api/items": [
+        "/api/items"
+      ],
+      "singleton_/download": [
+        "/download"
+      ],
+      "singleton_/login": [
+        "/login"
+      ],
+      "singleton_/run": [
+        "/run"
+      ],
+      "singleton_/search": [
+        "/search"
+      ]
+    },
+    "cluster_method": "TfidfVectorizer + DBSCAN (sklearn)",
+    "adaptations": [
+      {
+        "key": "auth_tracking",
+        "effect": "behaviour: failed-login tracking ON, brute-force weight raised",
+        "because": "1 auth endpoint(s), auth params: pass, user"
+      },
+      {
+        "key": "traversal_watch",
+        "effect": "+10 rule points whenever a file-ish parameter is present",
+        "because": "file-ish params: file"
+      },
+      {
+        "key": "reflection_watch",
+        "effect": "XSS/SQLi sensitivity raised on search params",
+        "because": "canary aegisprobe70760 reflected by target -> input reaches the page"
+      }
+    ],
+    "thresholds": {
+      "block": 81,
+      "challenge": 31,
+      "unsure": 10
+    },
+    "watched_params": [
+      "file",
+      "q"
+    ],
+    "errors": []
+  }
+}

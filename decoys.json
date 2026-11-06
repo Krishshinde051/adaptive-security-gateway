@@ -1,0 +1,79 @@
+{
+  "note": "AEGIS Class B bait paths - never linked from the real app; any request = decoy hit -> BLOCK. Class A canary = /internal/agent/exec?k=<token> (auto-planted in HTML). Class C persona = /api/assistant/*.",
+  "total": 52,
+  "categories": {
+    "secrets_keys": [
+      "/.env",
+      "/.env.local",
+      "/.env.production",
+      "/config/secrets.json",
+      "/secrets.json",
+      "/credentials.json",
+      "/.ssh/id_rsa",
+      "/.ssh/authorized_keys",
+      "/.aws/credentials",
+      "/.aws/config",
+      "/.kube/config",
+      "/wp-config.php",
+      "/wp-config.php.bak"
+    ],
+    "git_scm_probes": [
+      "/.git/config",
+      "/.git/HEAD",
+      "/.svn/entries",
+      "/.dockerenv"
+    ],
+    "db_dumps_exports": [
+      "/backup.sql",
+      "/dump.sql",
+      "/db/production.sql",
+      "/data/users.csv",
+      "/backups/site-full.tar.gz",
+      "/api/v1/exports/customers.csv"
+    ],
+    "admin_debug_consoles": [
+      "/admin-backup",
+      "/admin/console",
+      "/admin.php",
+      "/old-login",
+      "/phpmyadmin/index.php",
+      "/wp-admin/setup-config.php",
+      "/jmx-console/invoker/EJBInvokerServlet",
+      "/manager/html",
+      "/_profiler/latest",
+      "/trace.axd",
+      "/elmah.axd",
+      "/graphiql",
+      "/debug/default/view",
+      "/phpinfo.php",
+      "/server-status"
+    ],
+    "internal_api": [
+      "/internal-api",
+      "/internal-api/v2/schema",
+      "/api/internal/debug",
+      "/api/v1/admin",
+      "/api/v2/admin/users",
+      "/api/debug/vars",
+      "/api/internal/keys",
+      "/test-db"
+    ],
+    "framework_actuator": [
+      "/actuator/health",
+      "/actuator/env",
+      "/actuator/metrics"
+    ],
+    "cloud_ci": [
+      "/metadata/v1/user-data",
+      "/ci/deploy-token"
+    ],
+    "ai_supply_chain": [
+      "/.well-known/ai-plugin.json"
+    ],
+    "legacy_pool": []
+  },
+  "coverage_check": {
+    "in_registry_not_in_categories": [],
+    "in_categories_not_in_registry": []
+  }
+}

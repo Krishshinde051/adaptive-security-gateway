@@ -1,0 +1,51 @@
+{
+  "model": "IsolationForest",
+  "type": "unsupervised_anomaly_detection",
+  "features": [
+    "url_length",
+    "url_entropy",
+    "num_special_chars",
+    "num_encoded_chars",
+    "has_sql_keywords",
+    "has_js_keywords",
+    "has_path_traversal",
+    "has_cmd_injection",
+    "has_xxe_patterns",
+    "has_ssi_patterns",
+    "has_injection_patterns",
+    "has_prompt_injection",
+    "has_suspicious_encoding",
+    "body_length",
+    "body_entropy",
+    "num_headers",
+    "has_user_agent",
+    "requests_per_minute",
+    "unique_urls_per_session",
+    "error_rate"
+  ],
+  "n_features": 20,
+  "params": {
+    "n_estimators": 200,
+    "max_samples": "auto",
+    "contamination": 0.4001960960870827,
+    "decision_threshold": -0.10525772871685816,
+    "threshold_method": "train 5th percentile (~95% specificity)",
+    "max_f1_threshold": 0.002064774300522242
+  },
+  "test_metrics": {
+    "accuracy": 0.6482176266370522,
+    "precision": 0.9995870328308899,
+    "recall": 0.121025,
+    "f1": 0.21590883749972126,
+    "specificity": 0.9999666394221948
+  },
+  "confusion": {
+    "tn": 59949,
+    "fp": 2,
+    "fn": 35159,
+    "tp": 4841
+  },
+  "trained_rows": 499755,
+  "inference_ms": 0.09553980827331543,
+  "note": "20-feature retrain; supersedes models/isolation_forest.pkl (22-feature, unusable live)"
+}

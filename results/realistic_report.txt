@@ -1,0 +1,27 @@
+======================================================================
+AEGIS REALISTIC ML REPORT (NO DATA LEAKAGE)
+======================================================================
+
+Generated: 2026-09-22T01:22:21.987096
+Dataset: 499,755 samples, 20 features
+Note: risk_score and severity_numeric REMOVED
+
+Rank  Model                          Acc     Prec      Rec       F1      AUC
+----------------------------------------------------------------------
+1     MLP Neural Network          0.9988   0.9998   0.9972   0.9985   0.9994
+2     Gradient Boosting           0.9987   0.9998   0.9970   0.9984   0.9996
+3     Random Forest               0.9985   1.0000   0.9963   0.9981   0.9995
+4     Decision Tree               0.9985   1.0000   0.9963   0.9981   0.9981
+5     AdaBoost                    0.9979   1.0000   0.9947   0.9973   0.9992
+6     Extra Trees                 0.9947   1.0000   0.9867   0.9933   0.9988
+7     K-Nearest Neighbors         0.9925   1.0000   0.9812   0.9905   0.9956
+8     Linear SVM                  0.9883   0.9955   0.9751   0.9852   0.0000
+9     Logistic Regression         0.9881   0.9933   0.9769   0.9851   0.9964
+
+BEST: MLP Neural Network
+Accuracy: 0.9988
+Precision: 0.9998
+Recall: 0.9972
+F1: 0.9985
+AUC: 0.9994
+Confusion: TP=39890, TN=59943, FP=8, FN=110

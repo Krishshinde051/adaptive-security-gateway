@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AEGIS · Adaptive Security Gateway</title>
+<style>
+:root{
+  --bg:#0b0f1a;--panel:#121826;--panel2:#171e30;--line:#232c45;--txt:#dbe2f1;
+  --dim:#8b95b0;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--mid:#38bdf8;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,Segoe UI,sans-serif}
+header{display:flex;align-items:center;gap:14px;padding:14px 20px;background:linear-gradient(#141b2e,#0f1524);
+  border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20;flex-wrap:wrap}
+h1{font-size:17px;margin:0;letter-spacing:.4px}
+h1 span{color:var(--mid)}
+.pill{font:12px var(--mono);background:var(--panel2);border:1px solid var(--line);
+  padding:3px 9px;border-radius:99px;color:var(--dim)}
+.pill.on{color:var(--ok);border-color:#1d4c31}
+.wrap{display:grid;grid-template-columns:1fr 330px;gap:16px;padding:16px 20px;max-width:1600px}
+@media(max-width:1050px){.wrap{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:1.3px;color:var(--dim);
+  margin:0 0 12px;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input,select,button,textarea{font:13px system-ui;background:var(--panel2);color:var(--txt);
+  border:1px solid var(--line);border-radius:7px;padding:8px 11px}
+input:focus,select:focus{outline:1px solid var(--mid)}
+button{cursor:pointer}
+button:hover{border-color:var(--mid)}
+button.pri{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
+button.pri:hover{background:#2563eb}
+button.danger{border-color:#5c1d1d;color:#fca5a5}
+.grow{flex:1;min-width:220px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.tile{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+.tile b{display:block;font-size:23px;font-weight:650;line-height:1.2}
+.tile small{color:var(--dim);font-size:11px;text-transform:uppercase;letter-spacing:.7px}
+.t-ok b{color:var(--ok)}.t-warn b{color:var(--warn)}.t-bad b{color:var(--bad)}.t-mid b{color:var(--mid)}
+.bar{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--panel2);border:1px solid var(--line)}
+.bar i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:11.5px;color:var(--dim)}
+.legend s{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;text-decoration:none}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{color:var(--dim);text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;
+  letter-spacing:.7px;padding:7px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel)}
+td{padding:7px 8px;border-bottom:1px solid #1a2135;vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:#182034}
+td.mono{font-family:var(--mono);font-size:11.5px;color:#a9b4ce}
+.tag{display:inline-block;font:11px var(--mono);padding:1px 7px;border-radius:5px;border:1px solid}
+.ALLOW{color:var(--ok);border-color:#1d4c31;background:#0e2a1c}
+.CHALLENGE{color:var(--warn);border-color:#5b4110;background:#2a200b}
+.BLOCK{color:var(--bad);border-color:#5c1d1d;background:#2a0f0f}
+.sev-LOW{color:#7dd3a0}.sev-MEDIUM{color:#fcd34d}.sev-HIGH{color:#fdba74}.sev-CRITICAL{color:#fca5a5}
+.score{font:600 12px var(--mono)}
+.scroller{max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:9px}
+.filters button{padding:5px 10px;font-size:12px}
+.filters button.act{border-color:var(--mid);color:#fff;background:#12335e}
+pre.payload{white-space:pre-wrap;word-break:break-all;background:#0a0e17;border:1px solid var(--line);
+  border-radius:7px;padding:9px;font:11.5px/1.45 var(--mono);max-height:180px;overflow:auto;color:#9fb0d0;margin:6px 0 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:12.5px}
+.kv span:nth-child(odd){color:var(--dim)}
+.meter{height:7px;background:#0a0e17;border-radius:4px;overflow:hidden;margin:3px 0 7px}
+.meter i{display:block;height:100%;background:var(--mid)}
+.meter.r i{background:var(--bad)}.meter.w i{background:var(--warn)}.meter.g i{background:var(--ok)}
+.note{color:var(--dim);font-size:12px;margin-top:6px}
+.err{color:#fca5a5;font-size:12.5px;min-height:16px}
+ul.rules{margin:6px 0 0;padding-left:18px;font-size:12.5px}
+ul.rules li{margin:2px 0;color:#c4cee6}
+.modal{position:fixed;inset:0;background:rgba(4,7,14,.72);display:none;
+  align-items:flex-start;justify-content:center;padding:60px 16px;z-index:50;overflow:auto}
+.modal.open{display:flex}
+.drawer{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  width:min(880px,100%);padding:18px 20px}
+.drawer h3{margin:0 0 4px;font-size:15px}
+.x{float:right;cursor:pointer;color:var(--dim);font-size:20px;line-height:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.small{font-size:11.5px;color:var(--dim)}
+#toast{position:fixed;right:18px;bottom:18px;background:#0f1a2e;border:1px solid var(--line);
+  padding:10px 14px;border-radius:9px;font-size:12.5px;display:none;z-index:60}
+</style>
+</head>
+<body>
+<header>
+  <h1>AEGIS <span>· Adaptive Security Gateway</span></h1>
+  <span class="pill" id="pillTarget">target …</span>
+  <span class="pill" id="pillMode">mode …</span>
+  <span class="pill" id="pillVT">VT offline</span>
+  <span class="pill on" id="pillLive">live</span>
+  <span class="small" style="margin-left:auto">stage 1&nbsp;→&nbsp;2&nbsp;→&nbsp;3&nbsp;→&nbsp;4 segregation</span>
+</header>
+
+<div class="wrap">
+  <div>
+    <!-- SETUP -->
+    <div class="card">
+      <h2>Setup · put a target app behind the gateway</h2>
+      <div class="row">
+        <input class="grow" id="targetUrl" placeholder="http://127.0.0.1:5001" spellcheck="false">
+        <button class="pri" onclick="setTarget()">Secure this app</button>
+        <button onclick="buildProfile()">Build app profile</button>
+        <button onclick="resetLogs()" title="clear the dashboard log">Reset log</button>
+      </div>
+      <div class="err" id="setupErr"></div>
+      <div class="note">Requests are relayed to the target above; every stage-4 decision is listed below with
+        the payload, the score breakdown and the exact reason.</div>
+    </div>
+
+    <!-- SEGREGATION -->
+    <div class="card">
+      <h2>Stage 4 segregation</h2>
+      <div class="tiles" id="tiles"></div>
+      <div class="bar" id="segBar" style="margin-top:12px"></div>
+      <div class="legend">
+        <span><s style="background:#22c55e"></s>4.1 low risk → forwarded</span>
+        <span><s style="background:#f59e0b"></s>4.3 medium / unsure → CAPTCHA</span>
+        <span><s style="background:#ef4444"></s>4.2 high risk → blocked</span>
+        <span><s style="background:#38bdf8"></s>avg score</span>
+      </div>
+    </div>
+
+    <!-- LOG -->
+    <div class="card">
+      <h2>Inspected requests</h2>
+      <div class="row filters" style="margin-bottom:10px">
+        <button class="act" data-f="" onclick="setFilter(this,'action')">All</button>
+        <button data-f="ALLOW" onclick="setFilter(this,'action')">Forwarded</button>
+        <button data-f="CHALLENGE" onclick="setFilter(this,'action')">CAPTCHA</button>
+        <button data-f="BLOCK" onclick="setFilter(this,'action')">Blocked</button>
+        <select id="fCat" onchange="reload()"><option value="">all categories</option></select>
+        <input class="grow" id="fText" placeholder="filter by ip / path / reason / payload" oninput="debounce()">
+        <span class="small" id="logCount"></span>
+      </div>
+      <div class="scroller">
+        <table>
+          <thead><tr>
+            <th>#</th><th>time</th><th>client</th><th>req</th><th>score</th>
+            <th>stage 4</th><th>why</th>
+          </tr></thead>
+          <tbody id="logBody"><tr><td colspan="7" class="small">no traffic yet</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE -->
+  <div>
+    <div class="card">
+      <h2>Model &amp; pipeline</h2>
+      <div class="kv" id="modelBox"><span>loading…</span></div>
+      <div class="small" id="ifBox" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <h2>Blocked clients</h2>
+      <div id="blockBox" class="small">none</div>
+    </div>
+
+    <div class="card">
+      <h2>Source reputation</h2>
+      <div class="row">
+        <input class="grow" id="repIp" placeholder="ip to blacklist">
+        <button onclick="addRep()">Add</button>
+      </div>
+      <div id="repBox" class="small" style="margin-top:8px">no entries</div>
+    </div>
+
+    <div class="card">
+      <h2>Application profile</h2>
+      <div id="profBox" class="small">not built yet — paste a target and press “Build app profile”.</div>
+    </div>
+
+    <div class="card">
+      <h2>Gateway config</h2>
+      <div class="kv">
+        <span>block ≥</span><input id="cBlock" type="number" min="1" max="100">
+        <span>CAPTCHA ≥</span><input id="cChal" type="number" min="1" max="100">
+        <span>unsure ≥</span><input id="cUnsure" type="number" min="0" max="100">
+        <span>mode</span><select id="cMode">
+          <option value="block">block</option><option value="monitor">monitor (log only)</option>
+        </select>
+        <span>VirusTotal key</span><input id="cVT" placeholder="leave empty = offline">
+        <span>upstream proxy</span><input id="cUp" placeholder="http://127.0.0.1:8088 (Burp)">
+      </div>
+      <div class="row" style="margin-top:10px">
+        <button class="pri" onclick="saveCfg()">Apply</button>
+        <span class="err" id="cfgErr"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer">
+    <span class="x" onclick="closeDrawer()">&times;</span>
+    <h3 id="dTitle">request</h3>
+    <div class="small" id="dSub"></div>
+    <div class="grid2" style="margin-top:14px">
+      <div>
+        <h2>Score breakdown (stage 3)</h2>
+        <div id="dBars"></div>
+        <div class="kv" style="margin-top:10px" id="dKv"></div>
+      </div>
+      <div>
+        <h2>Stage 4 decision</h2>
+        <div id="dDec"></div>
+        <h2 style="margin-top:14px">Stage 2 findings</h2>
+        <div id="dFind"></div>
+      </div>
+    </div>
+    <h2 style="margin-top:14px">Request payload</h2>
+    <pre class="payload" id="dBody">—</pre>
+    <h2 style="margin-top:14px">Response</h2>
+    <div class="small" id="dRespHead" style="margin-bottom:6px">—</div>
+    <pre class="payload" id="dResp">—</pre>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let filterAction='', filterCat='', filterText='', logs=[], timer=null, debounceT=null;
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._h);t._h=setTimeout(()=>t.style.display='none',2600);}
+function debounce(){clearTimeout(debounceT);debounceT=setTimeout(reload,220);}
+function setFilter(el,f){filterAction=f;
+  document.querySelectorAll('.filters button').forEach(b=>b.classList.toggle('act',b===el));reload();}
+
+async function j(url,opt){const r=await fetch(url,opt);return r.json().catch(()=>({}));}
+async function post(url,data){return j(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data||{})});}
+
+/* ---------------- setup ---------------- */
+async function setTarget(){
+  const u=$('targetUrl').value.trim();
+  $('setupErr').textContent='';
+  const r=await post('/api/target',{url:u});
+  if(!r.ok){$('setupErr').textContent='could not reach target: '+(r.detail||r.reachable||'');}
+  else toast('secured → '+r.target);
+  refresh();
+}
+async function buildProfile(){
+  const u=$('targetUrl').value.trim();
+  toast('crawling target …');
+  const r=await post('/api/profile',{url:u});
+  if(!r.ok){$('profBox').innerHTML='<span style="color:#fca5a5">profile failed: '+esc(r.detail||'')+'</span>';return;}
+  drawProfile(r.profile); toast('profile built ('+r.profile.endpoints+' endpoints)');
+}
+function drawProfile(p){
+  if(!p){$('profBox').textContent='not built yet';return;}
+  const cl=Object.entries(p.clusters||{}).map(([k,v])=>esc(k)+': '+v.length).join(' · ')||'—';
+  $('profBox').innerHTML=
+    '<div class="kv">'+
+    '<span>stack</span><b>'+esc((p.stack||[]).join(', '))+'</b>'+
+    '<span>endpoints</span><b>'+p.endpoints+'</b>'+
+    '<span>params</span><b>'+((p.params||[]).length)+'</b>'+
+    '<span>forms</span><b>'+(p.forms||0)+'</b>'+
+    '<span>auth paths</span><b>'+esc((p.auth_endpoints||[]).join(', ')||'none')+'</b>'+
+    '<span>file params</span><b>'+esc((p.file_params||[]).join(', ')||'none')+'</b>'+
+    '<span>reflects input</span><b>'+(p.reflection&&p.reflection.reflected?'yes':'no')+'</b>'+
+    '<span>clusters</span><b>'+esc(cl)+'</b>'+
+    '<span>method</span><b>'+esc(p.cluster_method||'')+'</b>'+
+    '</div>'+
+    '<div style="margin-top:9px"><b class="small">adaptations applied</b><ul class="rules">'+
+    (p.adaptations||[]).map(a=>'<li><b>'+esc(a.key)+'</b> — '+esc(a.effect)+
+      '<div class="small">'+esc(a.because)+'</div></li>').join('')+'</ul></div>';
+}
+
+/* ---------------- config ---------------- */
+async function loadCfg(){
+  const c=await j('/api/config'), d=c.decision||{}, ti=c.threat_intel||{};
+  $('cBlock').value=d.block; $('cChal').value=d.challenge; $('cUnsure').value=d.unsure;
+  $('cMode').value=d.mode; $('cVT').value=ti.vt_api_key||''; $('cUp').value=c.upstream_proxy||'';
+  $('targetUrl').value=c.target||c.target_url||$('targetUrl').value;
+}
+async function saveCfg(){
+  $('cfgErr').textContent='';
+  const r=await post('/api/config',{
+    decision:{block:+$('cBlock').value,challenge:+$('cChal').value,unsure:+$('cUnsure').value,
+              mode:$('cMode').value},
+    threat_intel:{vt_api_key:$('cVT').value},
+    upstream_proxy:$('cUp').value});
+  if(r.ok===false){$('cfgErr').textContent=r.detail||'rejected';return;}
+  toast('config applied'); refresh();
+}
+
+/* ---------------- logs ---------------- */
+async function reload(){
+  const q=new URLSearchParams({limit:'250'});
+  if(filterAction)q.set('action',filterAction);
+  if(filterCat)q.set('category',filterCat);
+  const r=await j('/api/logs?'+q);
+  logs=r.logs||[];
+  const t=filterText.toLowerCase();
+  const view=t?logs.filter(x=>JSON.stringify(x).toLowerCase().includes(t)):logs;
+  const cats=new Set(logs.map(x=>x.category));
+  const sel=$('fCat'), keep=sel.value;
+  sel.innerHTML='<option value="">all categories</option>'+
+    [...cats].sort().map(c=>'<option '+((c===keep)?'selected':'')+'>'+esc(c)+'</option>').join('');
+  filterCat=sel.value;
+  $('logCount').textContent=view.length+' shown / '+(r.total||0)+' total';
+  if(!view.length){$('logBody').innerHTML='<tr><td colspan="7" class="small">no matching requests</td></tr>';return;}
+  $('logBody').innerHTML=view.map(x=>{
+    const ts=new Date(x.ts*1000).toLocaleTimeString();
+    const u=(x.url||'').slice(0,64);
+    return '<tr onclick="openDrawer('+x.id+')">'+
+      '<td class="mono">'+x.id+'</td>'+
+      '<td class="mono">'+ts+'</td>'+
+      '<td class="mono">'+esc(x.ip)+'</td>'+
+      '<td class="mono"><b>'+esc(x.method)+'</b> '+esc(u)+
+        '<div class="small">HTTP '+esc(x.status)+' · '+
+        esc(((x.response&&x.response.content_type)||'-').split(';')[0])+
+        ' · '+((x.response&&x.response.length)||0)+' B</div></td>'+
+      '<td class="score sev-'+esc(x.severity)+'">'+x.score+'</td>'+
+      '<td><span class="tag '+esc(x.action)+'">'+esc(x.action)+'</span></td>'+
+      '<td>'+esc((x.reason||'').slice(0,90))+
+        '<div class="small">'+esc(x.category||'')+' · '+esc(x.tier||'')+'</div></td></tr>';
+  }).join('');
+}
+function openDrawer(id){
+  const x=logs.find(l=>l.id===id); if(!x)return;
+  $('dTitle').textContent=x.method+' '+x.url;
+  $('dSub').innerHTML='#'+x.id+' · '+new Date(x.ts*1000).toLocaleString()+' · client '+esc(x.ip)+
+    ' · upstream '+esc(x.target||'—')+' · '+esc(x.ua||'').slice(0,80);
+  const c=x.components||{};
+  const rows=[['rules',c.rules||0,'#ef4444'],['ml (RF×0.3 cap30)',c.ml||0,'#38bdf8'],
+              ['iforest',c.iforest||0,'#a78bfa'],['behaviour',c.behaviour||0,'#f59e0b'],
+              ['threat intel',c.threat_intel||0,'#f472b6']];
+  const tot=Math.max(1,x.score||1);
+  $('dBars').innerHTML=rows.map(([k,v,col])=>
+    '<div class="small" style="display:flex;justify-content:space-between"><span>'+k+'</span>'+
+    '<b>'+v+'</b></div>'+
+    '<div class="meter"><i style="width:'+Math.min(100,Math.abs(v)/tot*100)+'%;background:'+col+'"></i></div>').join('');
+  const ml=x.ml||{};
+  $('dKv').innerHTML=
+    '<span>total</span><b class="sev-'+esc(x.severity)+'">'+x.score+' · '+esc(x.severity)+'</b>'+
+    '<span>RF p(attack)</span><b>'+((ml.proba_attack!=null)?ml.proba_attack:'—')+'</b>'+
+    '<span>grey zone</span><b>'+(ml.grey_zone?'yes (unsure → CAPTCHA)':'no')+'</b>'+
+    '<span>inference</span><b>'+(ml.inference_ms||'—')+' ms</b>'+
+    '<span>test acc / f1</span><b>'+(ml.test_acc||'—')+' / '+(ml.test_f1||'—')+'</b>';
+  $('dDec').innerHTML='<span class="tag '+esc(x.action)+'">'+esc(x.action)+'</span> '+
+    '<span class="small">status '+esc(x.status)+' · tier '+esc(x.tier||'—')+'</span>'+
+    '<div style="margin-top:6px">'+esc(x.reason||'')+'</div>'+
+    (x.cf?'<div class="small" style="margin-top:6px">counterfactual: '+esc(x.cf)+'</div>':'');
+  const rules=(x.rules||[]).map(r=>'<li>'+esc(typeof r==='string'?r:(r.name||JSON.stringify(r)))+
+    (r.points!=null?' <b>+'+r.points+'</b>':'')+'</li>').join('');
+  const bits=[];
+  if(rules)bits.push('<ul class="rules">'+rules+'</ul>');
+  if(x.honey)bits.push('<div class="tag BLOCK">deception: '+esc(JSON.stringify(x.honey))+'</div>');
+  if(x.threat)bits.push('<div class="small">threat intel: '+esc(JSON.stringify(x.threat))+'</div>');
+  if(x.notes)bits.push('<div class="small">notes: '+esc(JSON.stringify(x.notes))+'</div>');
+  $('dFind').innerHTML=bits.join('')||'<span class="small">no rule hits (ML/behaviour only)</span>';
+  $('dBody').textContent=x.body||'(empty body)';
+  const rs=x.response||{};
+  $('dRespHead').innerHTML=rs.status!=null
+    ? '<b>HTTP '+rs.status+'</b> · '+esc(rs.content_type||'-')+' · '+(rs.length||0)+' bytes'
+    : 'no response captured';
+  $('dResp').textContent=rs.body||'(no response captured)';
+  $('modal').classList.add('open');
+}
+function closeDrawer(){$('modal').classList.remove('open');}
+
+/* ---------------- side panels ---------------- */
+async function loadStats(){
+  const s=await j('/api/stats');
+  const a=s.by_action||{}, sev=s.by_severity||{};
+  const fwd=(a.ALLOW||0), ch=(a.CHALLENGE||0), bl=(a.BLOCK||0), tot=s.total||0;
+  $('tiles').innerHTML=
+    '<div class="tile t-ok"><b>'+fwd+'</b><small>4.1 forwarded</small></div>'+
+    '<div class="tile t-warn"><b>'+ch+'</b><small>4.3 CAPTCHA</small></div>'+
+    '<div class="tile t-bad"><b>'+bl+'</b><small>4.2 blocked</small></div>'+
+    '<div class="tile t-mid"><b>'+(s.avg_score||0)+'</b><small>avg risk</small></div>'+
+    '<div class="tile"><b>'+tot+'</b><small>inspected</small></div>'+
+    '<div class="tile"><b>'+(s.blocked_ips||0)+'</b><small>IPs blocked</small></div>'+
+    '<div class="tile"><b>'+(sev.CRITICAL||0)+'</b><small>critical</small></div>';
+  const seg=(a.ALLOW||0)+(a.CHALLENGE||0)+(a.BLOCK||0)||1;
+  $('segBar').innerHTML=
+    '<i style="width:'+((a.ALLOW||0)/seg*100)+'%;background:#22c55e"></i>'+
+    '<i style="width:'+((a.CHALLENGE||0)/seg*100)+'%;background:#f59e0b"></i>'+
+    '<i style="width:'+((a.BLOCK||0)/seg*100)+'%;background:#ef4444"></i>';
+  if(s.target){$('pillTarget').textContent='target '+s.target;$('targetUrl').value=s.target;}
+  $('pillMode').textContent='mode '+(s.mode||'block');
+}
+async function loadModel(){
+  const m=await j('/api/model'), s=m.supervised||{};
+  const rows=[['algorithm',s.type||m.algorithm||m.model||'RandomForest'],
+    ['trained rows',s.trained_rows||m.trained_rows||'—'],
+    ['features',Array.isArray(s.features)?s.features.length:(Array.isArray(m.features)?m.features.length:20)],
+    ['test accuracy',(s.test_acc||m.test_acc)!=null?(+(s.test_acc||m.test_acc)).toFixed(4):'—'],
+    ['test F1',(s.test_f1||m.test_f1)!=null?(+(s.test_f1||m.test_f1)).toFixed(4):'—'],
+    ['thresholds',m.thresholds?JSON.stringify(m.thresholds):'—']];
+  $('modelBox').innerHTML=rows.map(([k,v])=>'<span>'+esc(k)+'</span><b>'+esc(v)+'</b>').join('');
+  $('ifBox').textContent='IsolationForest: '+(m.unsupervised?
+    (m.unsupervised.type+' · thr '+((m.unsupervised.params||{}).decision_threshold||'?')+
+     ' · '+JSON.stringify(m.unsupervised.test_metrics||{})):'see gateway/models/iforest_config.json');
+  const ti=await j('/api/health');
+  if(ti.threat_intel)$('pillVT').textContent=ti.threat_intel.vt_key_configured?
+    'VT key set':'VT offline (no key)';
+}
+async function loadBlocked(){
+  const b=await j('/api/blocked');
+  const ips=b.ips||[];
+  $('blockBox').innerHTML=ips.length?('<div class="kv">'+
+    ips.map(x=>'<span>'+esc(x.ip)+'</span><b class="small">tier '+x.tier+
+      ' · '+x.ttl_hours+'h · '+esc(x.reason||'')+
+      ' <button style="padding:1px 7px;font-size:11px" onclick="unblock(\''+esc(x.ip)+'\')">remove</button></b>').join('')+
+    '</div>'):'no blocked clients';
+}
+async function unblock(ip){await post('/api/unblock',{ip});loadBlocked();toast('unblocked '+ip);}
+async function addRep(){
+  const ip=$('repIp').value.trim(); if(!ip)return;
+  await post('/api/reputation',{ip,note:'manual blacklist'}); $('repIp').value=''; loadRep();
+}
+async function loadRep(){
+  const r=await j('/api/reputation'); const e=r.entries||[];
+  $('repBox').innerHTML=e.length?
+    e.map(x=>'<div class="small">• <b>'+esc(x.ip||x)+'</b> '+esc(x.note||'')+'</div>').join(''):
+    'no entries';
+}
+
+/* ---------------- refresh ---------------- */
+async function refresh(){await Promise.all([loadStats(),loadModel(),loadBlocked(),loadRep(),reload()]);}
+loadCfg().then(refresh);
+drawProfile(null);
+timer=setInterval(()=>{loadStats();reload();loadModel();},2500);
+setInterval(loadBlocked,7000);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
+</script>
+</body>
+</html>

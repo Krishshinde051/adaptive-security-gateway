@@ -1,0 +1,95 @@
+
+\chapter{Implementation and Testing}
+
+This chapter documents the construction of the working prototype and the tests applied to it. It explains how the proposed architecture was converted into a functioning gateway: the dataset used for training, the machine-learning models and their configuration, the web interface, and the evaluation carried out to validate the result.
+
+\section{Data Collection and Pre-processing}
+
+\textbf{Dataset Identification.} The dataset was generated specifically for this project by the custom generator \texttt{scripts/generate\_dataset.py}, which produces realistic HTTP requests (method, URL, headers, body and per-client traffic statistics). Public intrusion-detection corpora were not used because they contain raw network packets rather than the application-layer requests inspected by the gateway.
+
+\textbf{Data Description.} The cleaned file \texttt{dataset/ml\_dataset\_fixed.csv} contains 499,755 records with 20 model features, a binary label and an attack category. The label distribution is 299,755 benign records (59.98\%) and 200,000 attack records (40.02\%) across thirteen attack categories, the largest being SQL injection (29,966), cross-site scripting (29,899), prompt injection (20,261) and path traversal (19,848). The features combine continuous measurements such as URL length, URL entropy, body length, header count, requests per minute and error rate with binary pattern flags for SQL, JavaScript, traversal, command-injection, XXE and prompt-injection content.
+
+\textbf{Pre-processing Steps.} Two label-derived columns (\texttt{risk\_score} and \texttt{severity}) were removed because they encode the answer and would leak it into the model; earlier experiments that retained them reached a deceptively perfect accuracy of 1.0000. The behavioural columns were then re-sampled so that benign and attack records overlap realistically, removing the artificial separation that had produced 0.9988 accuracy. The dataset contains no duplicate rows and no missing values among the twenty model features. Feature scaling uses \texttt{StandardScaler}, fitted on the training partition only.
+
+\textbf{Data Splitting.} The data was divided 80:20 into training and testing sets using stratified sampling with a fixed random seed of 42, giving 399,804 training records and 99,951 test records while preserving the class ratio in both partitions. Stratification keeps the minority attack classes represented on both sides, and the fixed seed makes every later experiment reproducible.
+
+\section{ML Model Development}
+
+\textbf{Algorithm Selection.} Nine supervised classifiers were trained on the same split and compared: multi-layer perceptron, gradient boosting, decision tree, random forest, k-nearest neighbours, logistic regression, linear SVM, AdaBoost and extra trees. Random Forest was selected for deployment inside the gateway. Although the multi-layer perceptron achieved the highest raw accuracy (0.9084), Random Forest was preferred because it produced the highest precision among the leading models (0.9906), the smallest gap between training and testing accuracy (0.0004) and an AUC of 0.9377. In a gateway a false positive blocks a legitimate user, so precision is weighted above recall; Random Forest also returns deterministic predictions, per-feature importances for the explanation panel, and low inference cost on every request.
+
+A second, unsupervised model, Isolation Forest, complements it. This model is trained only to recognise normal traffic and therefore does not require attack labels, which allows it to flag request shapes that were absent from the training data. Its threshold is set at the fifth percentile of the training anomaly scores, which limits it to approximately 95\% specificity. Measured precision is 0.9996 and specificity 0.99997, with a lower recall of 0.121, so it functions as a safety net contributing a capped number of risk points rather than as a primary detector.
+
+\textbf{Training Process.} Training was performed offline in Python 3.12 using scikit-learn on a Windows workstation. The cleaned dataset was scaled with \texttt{StandardScaler} fitted on the training partition, after which every classifier was fitted with a fixed random seed. The artifacts used by the gateway are the exported Random Forest model and its scaler (\texttt{models/aegis\_model.pkl} and \texttt{models/scaler.pkl}); the gateway reads no dataset at run time. Five-fold cross-validation on a 30,000-record subset produced a mean accuracy of 0.8281 with a standard deviation of 0.0023 for Random Forest, confirming that the result does not depend on a single favourable split.
+
+\textbf{Model Optimization.} Three optimisation steps were applied. First, the label-derived columns \texttt{risk\_score} and \texttt{severity} were removed, eliminating the leakage that had produced an accuracy of 1.0000. Second, the behavioural features were re-sampled so that benign and attack records overlap, which removed the remaining artificial separation that had produced 0.9988 accuracy. Third, the model was regularised with a maximum depth of 12, a minimum of 5 samples per leaf and balanced class weights, which kept the training and testing accuracies within 0.0004 of each other. On the held-out test partition of 99,951 records the final model reached an accuracy of 0.8847, precision of 0.9906, recall of 0.7186, F1 of 0.8330 and AUC of 0.9377, with 274 false positives among 59,951 benign records.
+
+Table \ref{tab:hyper_parameters} shows the hyperparameter values used for the deployed models.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Hyperparameters}
+	\label{tab:hyper_parameters}
+	\small
+	\begin{tabular}{
+			>{\RaggedRight}p{6.0cm}
+			>{\RaggedRight}p{6.0cm}
+		}
+		\toprule
+		\textbf{Parameters} & \textbf{Values} \\
+		\midrule
+		Classifier & Random Forest (scikit-learn) \\
+		\hline
+		\addlinespace
+		Number of trees & 100 \\
+		\hline
+		\addlinespace
+		Maximum depth & 12 \\
+		\hline
+		\addlinespace
+		Minimum samples per leaf & 5 \\
+		\hline
+		\addlinespace
+		Class weight & Balanced \\
+		\hline
+		\addlinespace
+		Feature scaling & StandardScaler (zero mean, unit variance) \\
+		\hline
+		\addlinespace
+		Train/test ratio & 80:20, stratified \\
+		\hline
+		\addlinespace
+		Random seed & 42 \\
+		\hline
+		\addlinespace
+		Isolation Forest trees & 200 \\
+		\hline
+		\addlinespace
+		Isolation Forest contamination & 0.4002 \\
+		\hline
+		\addlinespace
+		Anomaly threshold & 5th percentile of training scores ($-0.1053$) \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Web Interface Development}
+
+\textbf{Frontend Design.} The administrative interface is a single-page dashboard written in plain HTML, CSS and JavaScript (\texttt{gateway/static/index.html}) with no build step. It presents summary tiles for total, blocked, challenged and forwarded requests; a live request table showing method, path, client address, risk score, action and status; category and text filters; and a detail dialog containing stacked contribution bars for the rule, machine-learning, isolation-forest, behavioural and threat-intelligence components, the leading explanation reasons, a counterfactual suggestion, the matched rule signatures and the twenty extracted feature values. Separate panels manage blocked addresses, source reputation, the application profile and model information, while setup fields control the target URL and the operating mode. The request table refreshes every 2.5 seconds and the blocked-address list every 7 seconds.
+
+\textbf{Backend Integration.} The interface is served by the same FastAPI application that performs request inspection, so no additional web server is required. The application exposes a JSON interface comprising \texttt{/api/health}, \texttt{/api/target}, \texttt{/api/config}, \texttt{/api/logs}, \texttt{/api/stats}, \texttt{/api/model}, \texttt{/api/blocked}, \texttt{/api/unblock}, \texttt{/api/reputation}, \texttt{/api/challenge}, \texttt{/api/profile} and \texttt{/api/reset}, through which the dashboard reads state and applies administrative changes.
+
+\textbf{API/Service Flow.} Every inspected request is written to an in-memory log as a complete record containing the score, its components, the decision, the explanation and a summary of the response returned to the client. The browser polls \texttt{/api/logs} and \texttt{/api/stats} and renders the returned records; selecting a row displays that record in the detail dialog. Administrative actions such as unblocking an address, changing the target, running the profiler or resetting the log are POST requests whose effect appears on the following poll. When a request is challenged, the gateway returns HTTP 401 with an arithmetic question; the browser submits the answer to \texttt{/api/challenge}, which issues the clearance cookie, and the original request is repeated and then forwarded.
+
+\section{Testing}
+
+Five groups of tests were used to validate the implementation.
+
+\begin{enumerate}
+	\item \textbf{Pipeline unit gate} (\texttt{gateway/test\_pipeline.py}): verifies that the live feature vector matches the training column order, that benign requests score below the challenge threshold, that attack requests reach or exceed it, that the arithmetic challenge can be issued, verified and converted into a clearance, and that blocklist escalation works. Result: passed with exit code 0.
+	\item \textbf{End-to-end HTTP tests} (\texttt{gateway/test\_phases.py}): 44 checks across phases 5--10 covering service health, dashboard availability, completeness of logged records, direct-versus-gateway vulnerability comparison, application discovery, decoy and honeytoken behaviour, all three decision bands, double-encoded payloads and malicious-source blocking. Result: 44/44 passed.
+	\item \textbf{Signature accuracy} (\texttt{tools/rule\_check.py}): 13 attack payloads must be detected and 17 benign queries must not be flagged. Result: 0 attacks missed, 0 benign queries flagged.
+	\item \textbf{Adversarial mutation audit} (\texttt{tools/mutation\_audit.py}): 71 mutated variants of known payloads applying encoding changes, case changes, comment insertion, method changes and header changes. Result: 0 leaks -- every mutation reached at least the challenge band.
+	\item \textbf{Model evaluation}: the exported model was evaluated on the held-out test partition of 99,951 records, giving 0.8847 accuracy, 0.9906 precision, 0.7186 recall, 0.8330 F1 and 0.9377 AUC, with 274 false positives out of 59,951 benign records.
+\end{enumerate}
+
+Two limitations were measured honestly during adversarial testing. First, two hand-crafted requests were forwarded with risk scores of 7 and 5 because the rule boundary patterns do not recognise an ampersand inside a parameter value or a SQL comment that is not followed by whitespace, while the machine-learning contribution is capped at 30 points, below the 31-point challenge threshold. Second, the clearance cookie is bound to a client address for 600 seconds rather than to the individual request that was solved. Both findings are recorded as future work rather than hidden.

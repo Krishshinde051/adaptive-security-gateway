@@ -1,0 +1,42 @@
+{
+  "model": "IsolationForest",
+  "type": "unsupervised_anomaly_detection",
+  "params": {
+    "n_estimators": 100,
+    "max_samples": "auto",
+    "contamination": 0.4001960960870827,
+    "decision_threshold": 0.0009015514849716327
+  },
+  "features": [
+    "url_length",
+    "url_entropy",
+    "num_special_chars",
+    "num_encoded_chars",
+    "has_sql_keywords",
+    "has_js_keywords",
+    "has_path_traversal",
+    "has_cmd_injection",
+    "has_xxe_patterns",
+    "has_ssi_patterns",
+    "has_injection_patterns",
+    "has_prompt_injection",
+    "has_suspicious_encoding",
+    "body_length",
+    "body_entropy",
+    "num_headers",
+    "has_user_agent",
+    "requests_per_minute",
+    "unique_urls_per_session",
+    "error_rate",
+    "severity"
+  ],
+  "test_metrics": {
+    "accuracy": 0.9381396884473392,
+    "precision": 0.9188901275857798,
+    "recall": 0.927275,
+    "f1": 0.9230635226777826,
+    "specificity": 0.9453887341328752
+  },
+  "trained_rows": 499755,
+  "timestamp": "2026-09-22T13:01:36.040128"
+}

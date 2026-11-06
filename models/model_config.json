@@ -1,0 +1,28 @@
+{
+  "model": "RandomForest",
+  "features": [
+    "url_length",
+    "url_entropy",
+    "num_special_chars",
+    "num_encoded_chars",
+    "has_sql_keywords",
+    "has_js_keywords",
+    "has_path_traversal",
+    "has_cmd_injection",
+    "has_xxe_patterns",
+    "has_ssi_patterns",
+    "has_injection_patterns",
+    "has_prompt_injection",
+    "has_suspicious_encoding",
+    "body_length",
+    "body_entropy",
+    "num_headers",
+    "has_user_agent",
+    "requests_per_minute",
+    "unique_urls_per_session",
+    "error_rate"
+  ],
+  "test_acc": 0.8846534802053005,
+  "test_f1": 0.832959040264275,
+  "trained_rows": 499755
+}

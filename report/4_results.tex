@@ -1,0 +1,43 @@
+
+
+\chapter{Results and Discussion}
+
+In this chapter, we show how well the proposed model works for identifying various depression severity levels in tweets. 
+
+We used Python version 3 for the experimental setup. It helped us easily use different deep learning tools and libraries. To understand both word and sentence-level features, the model uses advanced methods like hierarchical attention and BERT-based embeddings. Table \ref{tab:hyper_parameters} shows the hyperparameter values we used to fine-tune and improve the performance of model.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Hyperparameters}  % Removed space between Hyper and parameters
+	\label{tab:hyper_parameters}
+	\small
+	\begin{tabular}{
+			>{\RaggedRight}p{6.0cm}  % Fixed column specification
+			>{\RaggedRight}p{6.0cm}
+		}
+		\toprule
+		\textbf{Parameters} & \textbf{Values} \\
+		\midrule
+		Optimizer & Adam \\
+		\hline
+		\addlinespace
+		Loss & Sparse Categorical Cross-Entropy \\  % Fixed hyphenation
+		\hline
+		\addlinespace
+		Epochs & 10 \\
+		\hline
+		\addlinespace
+		Activation & Softmax (output layer) \\
+		\hline
+		\addlinespace
+		Learning rate & 0.00005 \\
+		\hline
+		\addlinespace
+		Batch size & 32 \\
+		\bottomrule  % Added missing bottom rule
+	\end{tabular}
+\end{table}
+
+\section{Performance metrics} 
+
+In this section, we explain the performance metrics used to check the performance of model. These metrices include accuracy, precision, recall, and F1-score.

@@ -1,0 +1,139 @@
+\documentclass[12pt, a4paper, oneside]{report}
+\usepackage[top=1.25in, bottom=1.25in, left=1.5in, right=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{times} % Times New Roman font
+\usepackage[nottoc]{tocbibind} % Add bibliography to TOC
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{eso-pic}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{hyperref}
+\usepackage{ragged2e}
+\usepackage{booktabs} % Required for \toprule, \midrule, \bottomrule
+\usepackage{tabularx} % Optional for better table formatting
+\usepackage{enumitem}   % Required for custom enumerate labels
+\usepackage{pifont}     % For special symbols (▪)
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{amssymb}    % For mathematical symbols
+
+\usepackage{lscape}       % For landscape pages
+\usepackage{afterpage}    % For page-specific changes
+\usepackage{pdflscape}    % Better PDF landscape support
+
+\setlength{\parindent}{1.5em} % Enable and set indent
+%\usepackage{parskip} % <- Make sure this is commented out
+\usepackage{times}
+\renewcommand{\bibname}{References} % Place before 
+\onehalfspacing
+\setlength{\parindent}{0.5in}
+
+% Chapter formatting
+\titleformat{\chapter}[display]
+{\normalfont\Large\bfseries\centering}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+
+% Section formatting
+\titleformat{\section}
+{\normalfont\large\bfseries}{\thesection}{1em}{}
+
+% Header and footer setup
+%\pagestyle{fancy}
+%\fancyhf{}
+%\fancyhead[LE,RO]{\thepage}
+%\fancyhead[RE]{\leftmark}
+%\fancyhead[LO]{\rightmark}
+%\renewcommand{\headrulewidth}{0.5pt}
+
+% Front matter page numbering (roman)
+\newcommand{\frontmatter}{
+	\pagenumbering{roman}
+	\setcounter{page}{1}
+}
+
+% Main matter page numbering (arabic)
+\newcommand{\mainmatter}{
+	\pagenumbering{arabic}
+	\setcounter{page}{1}
+} 
+
+
+\begin{document}	
+	
+	\input{00_title_page.tex} 
+	\thispagestyle{empty}
+	\newpage
+	\input{01_certificate.tex} 
+	\thispagestyle{empty}
+	\newpage
+	\input{02_project_approval.tex} 
+	\thispagestyle{empty}
+	\newpage
+	\input{03_declaration.tex} 
+	\thispagestyle{empty}
+	\newpage
+	\input{04_acknowladgement.tex}
+	\thispagestyle{empty}
+	
+	
+	% Front Matter Content
+	\frontmatter
+	% Abstract
+	\input{05_abstract.tex}
+	
+	% Table of Contents
+	\renewcommand{\contentsname}{Table of Contents}
+	\tableofcontents
+	
+	% List of Figures
+	\listoffigures
+	
+	% List of Tables
+	\listoftables
+	
+	%Acronyms
+	\input{06_acronym.tex}
+	
+	\newpage
+	% Main Content
+	\mainmatter
+	
+	% Chapter 1: Introduction
+	\input{1_introduction.tex}
+	
+	% Chapter 2: Literature Review
+	\input{2_literature_review.tex}
+	
+	% Chapter 3: Research Objectives
+	\input{3_Methodology_and_Planning.tex}
+	
+	% Chapter 4:Implementation and Testing
+	\input{4_Implementation_and_Testing.tex}
+	
+	% Chapter 5: Results
+	\input{5_results.tex}		
+	
+	% Chapter 6: Conclusion
+	\input{6_conclusion.tex}
+	
+	% References
+	\input{7_bibliography.tex}
+	
+	%	\cleardoublepage
+	%	\bibliographystyle{plain} % or any other style you prefer
+	%	\bibliography{references} % your bibliography file
+	
+	% Appendices
+	%	\appendix
+	%	\chapter{Appendix A}
+	%	Your appendix content goes here...
+	
+\end{document}

@@ -1,0 +1,23 @@
+============================================================
+AEGIS MODEL COMPARISON REPORT
+============================================================
+
+Generated: 2026-09-22T12:25:14.216023
+Dataset: 5,000 samples, 22 features
+
+Model                          Acc     Prec      Rec       F1
+---------------------------------------------------------
+Decision Tree               1.0000   1.0000   1.0000   1.0000
+Gradient Boosting           1.0000   1.0000   1.0000   1.0000
+Linear SVM                  1.0000   1.0000   1.0000   1.0000
+Random Forest               0.9890   0.9974   0.9744   0.9857
+K-Nearest Neighbors         0.9800   1.0000   0.9487   0.9737
+AdaBoost                    0.8670   1.0000   0.6590   0.7944
+Logistic Regression         0.0380   0.0573   0.0949   0.0714
+MLP Neural Network          0.6100   0.0000   0.0000   0.0000
+
+BEST: Decision Tree
+Accuracy: 1.0000
+Precision: 1.0000
+Recall: 1.0000
+F1: 1.0000

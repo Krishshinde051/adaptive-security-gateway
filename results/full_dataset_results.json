@@ -1,0 +1,188 @@
+{
+  "timestamp": "2026-09-21T23:29:24.277980",
+  "dataset": {
+    "total_samples": 499755,
+    "train_samples": 399804,
+    "test_samples": 99951,
+    "features": 22,
+    "feature_names": [
+      "url_length",
+      "url_entropy",
+      "num_special_chars",
+      "num_encoded_chars",
+      "has_sql_keywords",
+      "has_js_keywords",
+      "has_path_traversal",
+      "has_cmd_injection",
+      "has_xxe_patterns",
+      "has_ssi_patterns",
+      "has_injection_patterns",
+      "has_prompt_injection",
+      "has_suspicious_encoding",
+      "body_length",
+      "body_entropy",
+      "num_headers",
+      "has_user_agent",
+      "requests_per_minute",
+      "unique_urls_per_session",
+      "error_rate",
+      "risk_score",
+      "severity_numeric"
+    ],
+    "benign_count": 299755,
+    "malicious_count": 200000
+  },
+  "best_model": "Random Forest",
+  "best_metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "roc_auc": 1.0,
+    "train_time": 11.529360055923462,
+    "inference_ms": 178.3158779144287,
+    "confusion_matrix": {
+      "tn": 59951,
+      "fp": 0,
+      "fn": 0,
+      "tp": 40000
+    }
+  },
+  "all_models": [
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "train_time": 11.529360055923462,
+      "inference_ms": 178.3158779144287,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "train_time": 1.265998125076294,
+      "inference_ms": 15.9149169921875,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "train_time": 85.70350551605225,
+      "inference_ms": 143.12195777893066,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "train_time": 13.664432048797607,
+      "inference_ms": 177.89220809936523,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 0.9999999999999999,
+      "train_time": 52.72704458236694,
+      "inference_ms": 1383.56351852417,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "train_time": 2.619884490966797,
+      "inference_ms": 0.0,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 0.0,
+      "train_time": 1.6420304775238037,
+      "inference_ms": 7.285594940185547,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "train_time": 45.103123903274536,
+      "inference_ms": 223.78015518188477,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 0,
+        "tp": 40000
+      }
+    },
+    {
+      "accuracy": 0.9998499264639673,
+      "precision": 1.0,
+      "recall": 0.999625,
+      "f1": 0.999812464837157,
+      "roc_auc": 0.9999750000000001,
+      "train_time": 0.047598838806152344,
+      "inference_ms": 28237.709045410156,
+      "confusion_matrix": {
+        "tn": 59951,
+        "fp": 0,
+        "fn": 15,
+        "tp": 39985
+      }
+    }
+  ]
+}
